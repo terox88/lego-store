@@ -1,0 +1,17 @@
+
+services:
+  db:
+    image: postgres:15
+    container_name: lego-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: lego_store
+      POSTGRES_USER: legoludek
+      POSTGRES_PASSWORD: legoludek
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
