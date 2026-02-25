@@ -128,6 +128,13 @@ public class LegoSet {
         this.createdAt = LocalDateTime.now();
     }
 
+    public void changeName(String name) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Name cannot be null or blank");
+        }
+        this.name = name;
+    }
+
     public void changePrice(BigDecimal newPrice) {
         if (newPrice == null || newPrice.signum() < 0) {
             throw new IllegalArgumentException("Price must be positive");
