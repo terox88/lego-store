@@ -173,4 +173,21 @@ public class LegoSet {
     private void updateAvailability() {
         this.availabilityType = AvailabilityType.from(quantityInStore, quantityInWarehouse);
     }
+    public void changeCondition (ConditionType condition) {
+        this.condition = condition;
+    }
+    public int getQuantityTotal() {
+        return quantityInStore + quantityInWarehouse;
+    }
+    public BigDecimal getConditionDiscount() {
+        return switch (condition) {
+            case NEW -> BigDecimal.ZERO;
+            case DAMAGED_BOX -> new BigDecimal("0.10");
+            case EXHIBITION -> new BigDecimal("0.20");
+        };
+    }
+    public BigDecimal getFinalPrice() {
+        BigDecimal discount = getConditionDiscount();
+        return basePrice.subtract(basePrice.multiply(discount));
+    }
 }
