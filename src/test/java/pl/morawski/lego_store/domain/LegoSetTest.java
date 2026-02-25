@@ -92,4 +92,45 @@ class LegoSetTest {
 
         assertEquals(BigDecimal.valueOf(1500), legoSet.getBasePrice());
     }
+
+    @Test
+    @DisplayName("Should return base price when condition is NEW")
+    void shouldReturnBasePriceWhenConditionIsNew() {
+        LegoSet legoSet = createValidLegoSet(1, 1);
+
+        BigDecimal finalPrice = legoSet.getFinalPrice();
+
+        assertEquals(0, finalPrice.compareTo(BigDecimal.valueOf(1999.99)));
+    }
+
+    @Test
+    @DisplayName("Should apply 10% discount for EXHIBITION condition")
+    void shouldApplyDiscountForExhibition() {
+        LegoSet legoSet = createValidLegoSet(1, 1);
+        legoSet.changeCondition(ConditionType.EXHIBITION);
+
+        BigDecimal finalPrice = legoSet.getFinalPrice();
+
+        BigDecimal expected = BigDecimal.valueOf(1999.99)
+                .subtract(BigDecimal.valueOf(1999.99)
+                        .multiply(BigDecimal.valueOf(0.20)));
+
+        assertEquals(0, finalPrice.compareTo(expected));
+    }
+
+    @Test
+    @DisplayName("Should apply 20% discount for DAMAGED_BOX condition")
+    void shouldApplyDiscountForDamagedBox() {
+        LegoSet legoSet = createValidLegoSet(1, 1);
+        legoSet.changeCondition(ConditionType.DAMAGED_BOX);
+
+        BigDecimal finalPrice = legoSet.getFinalPrice();
+
+        BigDecimal expected = BigDecimal.valueOf(1999.99)
+                .subtract(BigDecimal.valueOf(1999.99)
+                        .multiply(BigDecimal.valueOf(0.10)));
+
+        assertEquals(0, finalPrice.compareTo(expected));
+    }
+
 }
