@@ -26,13 +26,16 @@ public class LegoSet {
     private String setNumber;
 
     @Column(nullable = false)
-    private Integer numberOfPieces;
+    private int numberOfPieces;
 
     @Column(nullable = false)
-    private Integer numberOfBoxes;
+    private int numberOfBoxes;
 
     @Column(nullable = false)
-    private Integer quantityInStock;
+    private int quantityInWarehouse;
+
+    @Column(nullable = false)
+    private int quantityInStore;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal basePrice;
@@ -50,7 +53,7 @@ public class LegoSet {
     private ConditionType condition;
 
     @Column(nullable = false)
-    private Boolean discontinued;
+    private boolean discontinued;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -61,25 +64,63 @@ public class LegoSet {
     @Builder
     private LegoSet(String name,
                     String setNumber,
-                    Integer numberOfPieces,
-                    Integer numberOfBoxes,
-                    Integer quantityInStock,
+                    int numberOfPieces,
+                    int numberOfBoxes,
+                    int quantityInWarehouse,
+                    int quantityInStore,
                     BigDecimal basePrice,
                     LegoSeries series,
-                    AvailabilityType availabilityType,
                     ConditionType condition,
-                    Boolean discontinued) {
+                    boolean discontinued) {
+
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Name cannot be null or blank");
+        }
+
+        if (setNumber == null || setNumber.isBlank()) {
+            throw new IllegalArgumentException("Set number cannot be null or blank");
+        }
+
+        if (numberOfPieces <= 0) {
+            throw new IllegalArgumentException("Number of pieces must be greater than 0");
+        }
+
+        if (numberOfBoxes <= 0) {
+            throw new IllegalArgumentException("Number of boxes must be greater than 0");
+        }
+
+        if (quantityInWarehouse < 0) {
+            throw new IllegalArgumentException("Warehouse quantity cannot be negative");
+        }
+
+        if (quantityInStore < 0) {
+            throw new IllegalArgumentException("Store quantity cannot be negative");
+        }
+
+        if (basePrice == null || basePrice.signum() < 0) {
+            throw new IllegalArgumentException("Base price must be non-negative");
+        }
+
+        if (series == null) {
+            throw new IllegalArgumentException("Series cannot be null");
+        }
+
+        if (condition == null) {
+            throw new IllegalArgumentException("Condition cannot be null");
+        }
 
         this.name = name;
         this.setNumber = setNumber;
         this.numberOfPieces = numberOfPieces;
         this.numberOfBoxes = numberOfBoxes;
-        this.quantityInStock = quantityInStock;
+        this.quantityInWarehouse = quantityInWarehouse;
+        this.quantityInStore = quantityInStore;
         this.basePrice = basePrice;
         this.series = series;
-        this.availabilityType = availabilityType;
         this.condition = condition;
         this.discontinued = discontinued;
+
+        updateAvailability();
     }
 
     @PrePersist
@@ -94,21 +135,42 @@ public class LegoSet {
         this.basePrice = newPrice;
     }
 
-    public void increaseStock(int amount) {
+    public void increaseWarehouse(int amount) {
         if (amount <= 0) {
             throw new IllegalArgumentException("Amount must be positive");
         }
-        this.quantityInStock += amount;
+        this.quantityInWarehouse += amount;
+        updateAvailability();
     }
 
-    public void decreaseStock(int amount) {
-        if (amount <= 0 || amount > this.quantityInStock) {
+    public void decreaseWarehouse(int amount) {
+        if (amount <= 0 || amount > this.quantityInWarehouse) {
             throw new IllegalArgumentException("Invalid stock decrease");
         }
-        this.quantityInStock -= amount;
+        this.quantityInWarehouse -= amount;
+        updateAvailability();
+    }
+    public void increaseStore(int amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Amount must be positive");
+        }
+        this.quantityInStore += amount;
+        updateAvailability();
+    }
+
+    public void decreaseStore(int amount) {
+        if (amount <= 0 || amount > this.quantityInStore) {
+            throw new IllegalArgumentException("Invalid stock decrease");
+        }
+        this.quantityInStore -= amount;
+        updateAvailability();
     }
 
     public void markAsDiscontinued() {
         this.discontinued = true;
+    }
+
+    private void updateAvailability() {
+        this.availabilityType = AvailabilityType.from(quantityInStore, quantityInWarehouse);
     }
 }
