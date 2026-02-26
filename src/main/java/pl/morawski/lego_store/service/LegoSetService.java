@@ -90,4 +90,55 @@ public class LegoSetService {
 
         repository.delete(legoSet);
     }
+    @Transactional
+    public LegoSetResponse increaseWarehouse(Long id, int amount) {
+
+        LegoSet legoSet = repository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Lego set not found with id: " + id)
+                );
+
+        legoSet.increaseWarehouse(amount);
+
+        return mapper.toResponse(legoSet);
+    }
+
+    @Transactional
+    public LegoSetResponse decreaseWarehouse(Long id, int amount) {
+
+        LegoSet legoSet = repository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Lego set not found with id: " + id)
+                );
+
+        legoSet.decreaseWarehouse(amount);
+
+        return mapper.toResponse(legoSet);
+    }
+
+    @Transactional
+    public LegoSetResponse increaseStore(Long id, int amount) {
+
+        LegoSet legoSet = repository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Lego set not found with id: " + id)
+                );
+
+        legoSet.increaseStore(amount);
+
+        return mapper.toResponse(legoSet);
+    }
+
+    @Transactional
+    public LegoSetResponse decreaseStore(Long id, int amount) {
+
+        LegoSet legoSet = repository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Lego set not found with id: " + id)
+                );
+
+        legoSet.decreaseStore(amount);
+
+        return mapper.toResponse(legoSet);
+    }
 }

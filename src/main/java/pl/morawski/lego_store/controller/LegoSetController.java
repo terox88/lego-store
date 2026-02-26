@@ -8,10 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.morawski.lego_store.domain.AvailabilityType;
 import pl.morawski.lego_store.domain.ConditionType;
 import pl.morawski.lego_store.domain.LegoSeries;
-import pl.morawski.lego_store.dto.LegoSetCreateRequest;
-import pl.morawski.lego_store.dto.LegoSetFilter;
-import pl.morawski.lego_store.dto.LegoSetResponse;
-import pl.morawski.lego_store.dto.LegoSetUpdateRequest;
+import pl.morawski.lego_store.dto.*;
 import pl.morawski.lego_store.service.LegoSetService;
 
 import java.math.BigDecimal;
@@ -64,7 +61,7 @@ public class LegoSetController {
     @PutMapping("/{id}")
     public LegoSetResponse update(
             @PathVariable Long id,
-            @RequestBody LegoSetUpdateRequest request
+            @Valid @RequestBody LegoSetUpdateRequest request
     ) {
         return service.update(id, request);
     }
@@ -88,5 +85,37 @@ public class LegoSetController {
 
         Sort.Direction direction = Sort.Direction.fromString(parts[1]);
         return Sort.by(direction, parts[0]);
+    }
+
+    @PatchMapping("/{id}/warehouse/increase")
+    public LegoSetResponse increaseWarehouse(
+            @PathVariable Long id,
+            @Valid @RequestBody StockChangeRequest request) {
+
+        return service.increaseWarehouse(id, request.amount());
+    }
+
+    @PatchMapping("/{id}/warehouse/decrease")
+    public LegoSetResponse decreaseWarehouse(
+            @PathVariable Long id,
+            @Valid @RequestBody StockChangeRequest request) {
+
+        return service.decreaseWarehouse(id, request.amount());
+    }
+
+    @PatchMapping("/{id}/store/increase")
+    public LegoSetResponse increaseStore(
+            @PathVariable Long id,
+            @Valid @RequestBody StockChangeRequest request) {
+
+        return service.increaseStore(id, request.amount());
+    }
+
+    @PatchMapping("/{id}/store/decrease")
+    public LegoSetResponse decreaseStore(
+            @PathVariable Long id,
+            @Valid @RequestBody StockChangeRequest request) {
+
+        return service.decreaseStore(id, request.amount());
     }
 }
