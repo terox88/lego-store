@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.time.LocalDateTime;
 
@@ -39,6 +40,20 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 ex.getMessage()
         );
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationException(
+            MethodArgumentNotValidException ex) {
+
+        String message = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .findFirst()
+                .orElse("Validation error");
+
+        return buildResponse(HttpStatus.BAD_REQUEST, message);
     }
 
     @ExceptionHandler(Exception.class)

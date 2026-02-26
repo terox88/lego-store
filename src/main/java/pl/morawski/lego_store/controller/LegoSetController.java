@@ -1,5 +1,6 @@
 package pl.morawski.lego_store.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -55,7 +56,7 @@ public class LegoSetController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public LegoSetResponse create(@RequestBody LegoSetCreateRequest request) {
+    public LegoSetResponse create(@Valid @RequestBody LegoSetCreateRequest request) {
         return service.create(request);
     }
 
