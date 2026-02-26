@@ -16,11 +16,13 @@ import pl.morawski.lego_store.domain.ConditionType;
 import pl.morawski.lego_store.domain.LegoSeries;
 import pl.morawski.lego_store.dto.LegoSetCreateRequest;
 import pl.morawski.lego_store.dto.LegoSetResponse;
+import pl.morawski.lego_store.dto.StockChangeRequest;
 import pl.morawski.lego_store.exception.GlobalExceptionHandler;
 import pl.morawski.lego_store.service.LegoSetService;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -155,6 +157,40 @@ class LegoSetControllerTest {
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.name").value("Millennium Falcon"))
                 .andExpect(jsonPath("$.setNumber").value("75192"));
+    }
+
+    @Test
+    void shouldIncreaseWarehouseStock() throws Exception {
+
+        Long id = 1L;
+
+        StockChangeRequest request = new StockChangeRequest(5);
+
+        LegoSetResponse response = new LegoSetResponse(
+                id,
+                "Millennium Falcon",
+                "75192",
+                7541,
+                2,
+                15,
+                5,
+                20,
+                new BigDecimal("1999.99"),
+                new BigDecimal("1999.99"),
+                LegoSeries.STAR_WARS,
+                ConditionType.NEW,
+                AvailabilityType.IN_STORE_AND_SHIPPING,
+                false
+        );
+
+        when(service.increaseWarehouse(id, 5)).thenReturn(response);
+
+        mockMvc.perform(patch("/api/lego-sets/{id}/warehouse/increase", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.quantityInWarehouse").value(15))
+                .andExpect(jsonPath("$.quantityTotal").value(20));
     }
 
 }
