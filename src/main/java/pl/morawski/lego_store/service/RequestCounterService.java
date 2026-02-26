@@ -16,4 +16,7 @@ public class RequestCounterService {
     public long getCount() {
         return counter.get();
     }
+    public void reset() {
+        counter.set(0);
+    }
 }
