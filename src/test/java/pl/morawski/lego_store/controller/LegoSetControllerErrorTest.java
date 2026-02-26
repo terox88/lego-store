@@ -11,6 +11,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import pl.morawski.lego_store.configuration.RequestCounterFilter;
 import pl.morawski.lego_store.dto.LegoSetCreateRequest;
+import pl.morawski.lego_store.dto.StockChangeRequest;
 import pl.morawski.lego_store.exception.ResourceNotFoundException;
 import pl.morawski.lego_store.service.LegoSetService;
 
@@ -20,6 +21,7 @@ import java.math.BigDecimal;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 
 
 import static org.mockito.Mockito.when;
@@ -79,6 +81,56 @@ class LegoSetControllerErrorTest {
         mockMvc.perform(post("/api/lego-sets")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
+    }
+
+    @Test
+    void shouldReturn400WhenStockAmountIsInvalid() throws Exception {
+
+        Long id = 1L;
+
+        StockChangeRequest invalidRequest = new StockChangeRequest(0);
+
+        mockMvc.perform(patch("/api/lego-sets/{id}/warehouse/increase", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
+    }
+
+    @Test
+    void shouldReturn404WhenIncreasingWarehouseForNonExistingSet() throws Exception {
+
+        Long id = 999L;
+
+        when(service.increaseWarehouse(id, 5))
+                .thenThrow(new ResourceNotFoundException(
+                        "Lego set not found with id: " + id
+                ));
+
+        StockChangeRequest request = new StockChangeRequest(5);
+
+        mockMvc.perform(patch("/api/lego-sets/{id}/warehouse/increase", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404));
+    }
+
+    @Test
+    void shouldReturn400WhenDecreasingMoreThanAvailable() throws Exception {
+
+        Long id = 1L;
+
+        when(service.decreaseWarehouse(id, 100))
+                .thenThrow(new IllegalArgumentException("Invalid stock decrease"));
+
+        StockChangeRequest request = new StockChangeRequest(100);
+
+        mockMvc.perform(patch("/api/lego-sets/{id}/warehouse/decrease", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400));
     }
