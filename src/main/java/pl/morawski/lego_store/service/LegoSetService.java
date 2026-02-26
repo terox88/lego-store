@@ -1,5 +1,6 @@
 package pl.morawski.lego_store.service;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -51,12 +52,12 @@ public class LegoSetService {
     }
 
     @Transactional(readOnly = true)
-    public List<LegoSetResponse> getAll(LegoSetFilter filter) {
+    public List<LegoSetResponse> getAll(LegoSetFilter filter, Sort sort) {
 
         Specification<LegoSet> specification =
                 LegoSetSpecification.withFilters(filter);
 
-        return repository.findAll(specification)
+        return repository.findAll(specification, sort)
                 .stream()
                 .map(mapper::toResponse)
                 .toList();
