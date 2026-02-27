@@ -1,17 +1,42 @@
 
+version: "3.9"
+
 services:
-  db:
+  postgres:
     image: postgres:15
     container_name: lego-postgres
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_DB: lego_store
-      POSTGRES_USER: legoludek
-      POSTGRES_PASSWORD: legoludek
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: lego
+      POSTGRES_PASSWORD: lego
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - lego-network
+
+  backend:
+    build: .
+    container_name: lego-backend
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/lego_store
+      SPRING_DATASOURCE_USERNAME: lego
+      SPRING_DATASOURCE_PASSWORD: lego
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      APP_SECURITY_USERNAME: legoludek
+      APP_SECURITY_PASSWORD: legoludek123
+      APP_SECURITY_JWT_SECRET: verySecretKeyThatIsLongEnoughForJwtSigning123456
+      APP_SECURITY_JWT_EXPIRATION: 3600000
+    networks:
+      - lego-network
 
 volumes:
   postgres_data:
+
+networks:
+  lego-network:
