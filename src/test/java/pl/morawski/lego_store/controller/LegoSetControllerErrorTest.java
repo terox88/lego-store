@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import pl.morawski.lego_store.configuration.RequestCounterFilter;
@@ -35,6 +36,7 @@ import static org.mockito.Mockito.when;
                 )
         }
 )
+@WithMockUser
 @AutoConfigureMockMvc(addFilters = false)
 class LegoSetControllerErrorTest {
 
