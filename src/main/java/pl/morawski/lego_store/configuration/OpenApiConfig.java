@@ -16,7 +16,8 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("Lego Store API")
-                        .description("REST API for managing Lego sets")
+                        .description("\"REST API for managing Lego sets, stock levels, pricing and availability. \"\n" +
+                                "                                + \"Includes filtering, sorting, JWT authentication and request metrics.\"")
                         .version("1.0.0"));
     }
 
