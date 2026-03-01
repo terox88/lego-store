@@ -7,6 +7,17 @@ The application provides filtering, sorting, JWT authentication,
 optimistic locking and Dockerized environment for easy setup.
 
 ------------------------------------------------------------------------
+## Project Structure
+
+Backend repository (this repo):  
+ https://github.com/terox88/lego-store
+
+Frontend repository (React):  
+ https://github.com/terox88/lego-store-frontend
+
+The frontend is a separate React application communicating with this API.
+
+------------------------------------------------------------------------
 
 ##  Features
 
@@ -121,16 +132,28 @@ Returns total number of handled HTTP requests.
 
 ------------------------------------------------------------------------
 
-##  Run with Docker
+## Running Full Application with Docker
 
-Build and start:
+Required folder structure:
+
+C:\java
+├── lego-store
+└── lego-store-frontend
+
+The docker-compose file builds frontend using:
+
+context: ../lego-store-frontend
+
+If structure differs, adjust the path.
+
+Run:
 
 docker compose up --build
 
 Access:
-
--   API: http://localhost:8080
--   Swagger: http://localhost:8080/swagger-ui.html
+Frontend: http://localhost:3000  
+Backend: http://localhost:8080  
+Swagger: http://localhost:8080/swagger-ui.html
 
 PostgreSQL runs inside Docker network (not publicly exposed).
 

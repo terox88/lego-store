@@ -35,6 +35,18 @@ services:
     networks:
       - lego-network
 
+  frontend:
+    build:
+      context: ../lego-store-frontend
+    container_name: lego-frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    networks:
+      - lego-network
+
+
 volumes:
   postgres_data:
 
